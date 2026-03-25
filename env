@@ -1,0 +1,115 @@
+#!/bin/bash
+# =============================================================================
+# env — переменные конфигурации сборки
+# Подключается первым: source "${BUILD_DIR}/env"
+#
+# Здесь только переменные — никакой логики.
+# =============================================================================
+
+# =============================================================================
+# Пути (все относительно BUILD_DIR — корня проекта)
+# =============================================================================
+KERNEL_DIR="${BUILD_DIR}/src/linux_kernel"
+
+# work/ — рабочие директории сборки (rootfs, монтирование, образы)
+OUT_DIR="${BUILD_DIR}/out"
+BASE_ROOTFS_DIR="${OUT_DIR}/debian-root-base"
+
+# overlay/ — файлы накладываемые на целевую систему
+OVERLAY_DIR="${BUILD_DIR}/overlay"
+OVERLAY_LIBS="${OVERLAY_DIR}/libs"
+OVERLAY_BINS="${OVERLAY_DIR}/bins"
+OVERLAY_NETWORK="${OVERLAY_DIR}/network"
+OVERLAY_PACKAGES="${OVERLAY_DIR}/packages"
+OVERLAY_SOURCES="${OVERLAY_DIR}/sources"
+OVERLAY_SERVICES="${OVERLAY_DIR}/services"
+
+# =============================================================================
+# Параметры загрузки ядра
+# =============================================================================
+BOOTARGS_COMMON="console=ttyS0,115200 rootwait panic=10 rw vmstat_shepherd.enable=0 usbcore.autosuspend=-1"
+BOOTARGS_SD="${BOOTARGS_COMMON} root=/dev/mmcblk1p2"
+BOOTARGS_EMMC="${BOOTARGS_COMMON} root=/dev/mmcblk2p2"
+
+# =============================================================================
+# Hostname целевой системы
+# =============================================================================
+DEVICE_HOSTNAME="nanopi-rt"
+
+# =============================================================================
+# U-Boot
+# =============================================================================
+# true  — собрать из исходников (git clone + make)
+# false — скопировать готовый из UBOOT_PREBUILT
+UBOOT_BUILD=true
+
+UBOOT_DIR="${BUILD_DIR}/src/uboot"
+UBOOT_PREBUILT="${BUILD_DIR}/src/uboot/u-boot-sunxi-with-spl.bin"
+
+# Репозиторий и ветка (используются при UBOOT_BUILD=true)
+UBOOT_REPO="https://github.com/friendlyarm/u-boot.git"
+UBOOT_BRANCH="sunxi-v2017.x"
+
+# Финальный путь к бинарю — используется в build_image.sh
+UBOOT_BIN="${BUILD_DIR}/src/uboot/u-boot-sunxi-with-spl.bin"
+
+# =============================================================================
+# Ядро Linux
+# =============================================================================
+# true  — клонировать из git репозитория (KERNEL_REPO)
+# false — использовать уже существующую директорию KERNEL_DIR
+KERNEL_CLONE=true
+
+KERNEL_REPO="https://github.com/friendlyarm/linux.git"
+KERNEL_BRANCH="sunxi-4.14.y"
+
+# =============================================================================
+# RT-патч
+# =============================================================================
+# true  — применить RT PREEMPT патч перед сборкой ядра
+# false — собрать ядро без RT патча
+RT_PATCH_ENABLE=true
+
+RT_PATCH_URL="https://mirrors.edge.kernel.org/pub/linux/kernel/projects/rt/4.14/older/patch-4.14.115-rt59.patch.xz"
+RT_PATCH_FILE="${KERNEL_DIR}/patch-4.14.115-rt59.patch"
+
+# =============================================================================
+# Пользователи целевой системы
+# =============================================================================
+ROOT_PASSWORD="pass"
+USER_NAME="user"
+USER_PASSWORD="pass"
+
+# =============================================================================
+# Debian
+# =============================================================================
+DEBIAN_SUITE="bullseye"
+DEBIAN_MIRROR="http://deb.debian.org/debian"
+
+# =============================================================================
+# Кросс-компиляция
+# =============================================================================
+ARCH=arm
+
+# Тулчейн FriendlyARM (префикс arm-linux-) — рекомендован для ядра и U-Boot
+# Используется если UBOOT_USE_FA_TOOLCHAIN=true
+FA_TOOLCHAIN_DIR="/opt/FriendlyARM/toolchain/4.9.3/bin"
+CROSS_COMPILE_FA=arm-linux-
+
+# Тулчейн Linaro 4.9 (префикс arm-linux-gnueabihf-) — запасной вариант
+CROSS_COMPILE_LINARO=arm-linux-gnueabihf-
+KCFLAGS="-march=armv7-a -mtune=cortex-a7 -mfpu=neon-vfpv4"
+
+# Использовать FriendlyARM тулчейн для ядра и U-Boot (рекомендуется)
+# true  — arm-linux- (FriendlyARM)
+# false — arm-linux-gnueabihf- (Linaro)
+USE_FA_TOOLCHAIN=true
+
+# Итоговый CROSS_COMPILE — используется в скриптах
+# Устанавливается автоматически на основе USE_FA_TOOLCHAIN
+# Не меняйте вручную
+CROSS_COMPILE="${CROSS_COMPILE_LINARO}"  # переопределяется в скриптах
+
+# Тулчейн для U-Boot (FriendlyARM, префикс arm-linux-)
+UBOOT_USE_FA_TOOLCHAIN=true
+CROSS_COMPILE_UBOOT=arm-linux-

@@ -1,0 +1,34 @@
+# =============================================================================
+# packages/base.list — базовые пакеты
+# Устанавливаются в каждый образ поверх минимального debootstrap.
+# Один пакет на строку. Строки с # — комментарии.
+# =============================================================================
+
+# Сеть
+iproute2
+net-tools
+traceroute
+tcpdump
+
+# Система
+sudo
+systemd-sysv
+openssh-server
+parted
+rsync
+
+# Файловые системы
+dosfstools
+e2fsprogs
+u-boot-tools
+
+# Утилиты
+vim
+gpiod
+socat
+
+# Время
+ntp
+ntpdate
+linuxptp
+ptpd

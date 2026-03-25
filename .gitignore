@@ -1,0 +1,12 @@
+out/debian-root-*/
+out/mnt/boot/
+out/mnt/rootfs/
+out/images/*.img
+out/images/*.img.gz
+src/linux_kernel/
+src/uboot/
+!src/uboot/u-boot-sunxi-with-spl.bin
+gcc-linaro-*/
+/tmp/kernel_build.log
+*.img
+*.img.gz
